@@ -1,27 +1,28 @@
-import Layout from '@/app/layout';
+import AppLayout from '@/components/AppLayout';
 import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ITEMS } from '@/shared/constants';
+import LedgersPage from '@/pages/LedgersPage';
 
 function App() {
   return (
     <BrowserRouter>
-      <Layout>
+      <AppLayout>
         <Routes>
           <Route
             path="/"
-            element={<div>{ITEMS[0].title} Page</div>}
+            element={<JournalPage />}
           />
-
-          {ITEMS.map((item) => (
-            <Route
-              key={item.url}
-              path={item.url}
-              element={<div>{item.title} Page</div>}
-            />
-          ))}
+          <Route
+            path="/journal"
+            element={<JournalPage />}
+          />
+          <Route
+            path="/ledgers"
+            element={<LedgersPage />}
+          />
         </Routes>
-      </Layout>
+      </AppLayout>
     </BrowserRouter>
   );
 }

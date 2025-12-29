@@ -1,8 +1,7 @@
 import { BookOpen, NotebookTabs } from "lucide-react";
-import { type Account } from "../core/models/accounts";
+import { type Account } from "@/core/models/accounts";
 
-
-// Routes and Menu Items
+// Menu Items
 export const ITEMS = [
   {
     title: 'Journal',
