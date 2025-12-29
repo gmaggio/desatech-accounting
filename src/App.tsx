@@ -1,7 +1,7 @@
 import AppLayout from '@/components/AppLayout';
 import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { ITEMS } from '@/shared/constants';
+import JournalPage from '@/pages/JournalPage';
 import LedgersPage from '@/pages/LedgersPage';
 
 function App() {
