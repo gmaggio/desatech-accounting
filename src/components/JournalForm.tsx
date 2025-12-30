@@ -21,6 +21,8 @@ import {
 import { ChevronDownIcon, Trash2 } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { CHART_OF_ACCOUNTS } from '@/shared/constants';
+import { cn } from '@/lib/utils';
+import { Separator } from '@/components/ui/separator';
 
 export function JournalForm() {
   const addJournal = useAccountingStore((s) => s.addJournal);
@@ -50,9 +52,6 @@ export function JournalForm() {
 
   const removeLine = (index: number) => {
     const updated = lines.filter((_, i) => i !== index);
-
-    console.log('updated', updated);
-
     setLines(updated);
   };
 
@@ -65,6 +64,50 @@ export function JournalForm() {
     updated[index] = { ...updated[index], [field]: value };
     setLines(updated);
   };
+
+  const validateEntry = (
+    linesToCheck: JournalLine[],
+    date: Date | undefined,
+    description: string,
+    differenceInTotal: number = 0
+  ): boolean => {
+    // Must have date and description
+    if (!date || description.trim() === '') return false;
+
+    // Must have at least one line
+    if (linesToCheck.length === 0) return false;
+
+    // Each line must be complete
+    for (const line of linesToCheck) {
+      if (!line.accountCode || !line.amount || line.amount <= 0) {
+        return false;
+      }
+    }
+
+    // Must balance
+    if (differenceInTotal !== 0) return false;
+
+    return true;
+  };
+
+  const calculateTotals = (linesToCheck: JournalLine[]) => {
+    let totalDebit = 0;
+    let totalCredit = 0;
+
+    linesToCheck.forEach((line) => {
+      if (line.position === 'DEBIT' && line.amount) {
+        totalDebit += line.amount;
+      } else if (line.position === 'CREDIT' && line.amount) {
+        totalCredit += line.amount;
+      }
+    });
+
+    return { totalDebit, totalCredit, difference: totalDebit - totalCredit };
+  };
+
+  const { totalDebit, totalCredit, difference } = calculateTotals(lines);
+
+  const isValid = validateEntry(lines, date, description, difference);
 
   const submit = () => {
     const entry: JournalEntry = {
@@ -96,7 +139,10 @@ export function JournalForm() {
                 <Button
                   variant="outline"
                   id="date"
-                  className="w-full justify-between font-normal"
+                  className={cn(
+                    'w-full justify-between font-normal',
+                    !date && 'text-primary/50'
+                  )}
                 >
                   {date ? formatDate(date) : 'Select date'}
                   <ChevronDownIcon />
@@ -127,7 +173,8 @@ export function JournalForm() {
           </div>
         </div>
 
-        <div className="space-y-4">
+        {/* Line Entries */}
+        <div className={cn('space-y-4', lines.length > 0 && 'pt-2')}>
           {lines.map((line, i) => (
             <div
               key={i}
@@ -191,14 +238,47 @@ export function JournalForm() {
           ))}
         </div>
 
-        <div className="flex gap-2">
-          <Button
-            variant="secondary"
-            onClick={addLine}
-          >
-            + Line
-          </Button>
-          <Button onClick={submit}>Save</Button>
+        <div className="flex gap-20 pt-2">
+          {/* Actions */}
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              onClick={addLine}
+            >
+              + Add Line
+            </Button>
+            <Button
+              disabled={!isValid}
+              onClick={submit}
+            >
+              Save
+            </Button>
+          </div>
+
+          {/* Summary */}
+          <div className="flex flex-col w-full items-start gap-0.5 text-sm">
+            <h3 className="font-bold">Summary</h3>
+            <div className="flex w-full justify-between gap-2">
+              <h4>Total Debit</h4>
+              <p>{totalDebit.toLocaleString('id-ID')}</p>
+            </div>
+            <div className="flex w-full justify-between gap-2">
+              <h4>Total Credit</h4>
+              <p>{totalCredit.toLocaleString('id-ID')}</p>
+            </div>
+            <Separator />
+            <div
+              className={cn(
+                'flex w-full justify-between gap-2',
+                difference === 0
+                  ? 'text-green-600 font-semibold'
+                  : 'text-red-600 font-semibold'
+              )}
+            >
+              <h4>Difference {difference !== 0 && '(must be 0)'}</h4>
+              <p>{difference.toLocaleString('id-ID')}</p>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
