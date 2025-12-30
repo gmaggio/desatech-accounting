@@ -1,8 +1,8 @@
-import type { Account } from "../../core/models/accounts";
-import type { JournalEntry } from "../../core/models/journal";
-import type { LedgerAccount } from "../../core/models/ledger";
-import { CHART_OF_ACCOUNTS } from "../../shared/constants";
-import { validateJournal } from "./validation";
+import type { Account } from "@/core/models/accounts";
+import type { JournalEntry } from "@/core/models/journal";
+import type { LedgerAccount } from "@/core/models/ledger";
+import { validateJournal } from "@/lib/utils/validation";
+import { CHART_OF_ACCOUNTS } from "@/shared/constants";
 
 // Create a map for quick account lookup by code
 const accountMap = new Map<string, Account>(

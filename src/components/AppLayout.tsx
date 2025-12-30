@@ -9,7 +9,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
         <AppSidebar />
 
         <main className="flex-1 p-6 overflow-y-auto">
-          <SidebarTrigger className="bg-red-500 text-white hover:text-white/50" />
+          <SidebarTrigger />
           {children}
         </main>
       </SidebarProvider>

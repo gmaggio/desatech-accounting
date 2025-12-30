@@ -5,14 +5,14 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import type { Position } from '@/core/models/accounts';
 import type { JournalLine, JournalEntry } from '@/core/models/journal';
+import { Label } from '@/components/ui/label';
 import {
-  Label,
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
-} from '@radix-ui/react-select';
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export function JournalForm() {
   const addJournal = useAccountingStore((s) => s.addJournal);

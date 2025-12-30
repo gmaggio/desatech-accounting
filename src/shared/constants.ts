@@ -1,4 +1,4 @@
-import { BookOpen, NotebookTabs } from "lucide-react";
+import { BookOpen, FileText } from "lucide-react";
 import { type Account } from "@/core/models/accounts";
 
 // Menu Items
@@ -6,7 +6,7 @@ export const ITEMS = [
   {
     title: 'Journal',
     url: '/journal',
-    icon: NotebookTabs,
+    icon: FileText,
   },
   {
     title: 'Ledgers',

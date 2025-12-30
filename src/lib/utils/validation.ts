@@ -1,4 +1,4 @@
-import type { JournalEntry } from "../../core/models/journal";
+import type { JournalEntry } from "@/core/models/journal";
 
 export function validateJournal(entry: JournalEntry): void {
   // Get total debits

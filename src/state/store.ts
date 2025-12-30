@@ -2,9 +2,10 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import localforage from "localforage";
 
-import type { JournalEntry } from "../core/models/journal";
-import type { LedgerAccount } from "../core/models/ledger";
-import { postEntry } from "../lib/utils/posting";
+import type { JournalEntry } from "@/core/models/journal";
+import type { LedgerAccount } from "@/core/models/ledger";
+import { postEntry } from "@/lib/utils/posting";
+
 
 interface AccountingState {
   journals: JournalEntry[];
