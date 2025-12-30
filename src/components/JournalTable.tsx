@@ -6,11 +6,13 @@ import {
   TableHead,
   TableBody,
   TableCell,
+  Table,
 } from '@/components/ui/table';
-import { Table } from 'lucide-react';
 
 export function JournalTable() {
   const journals = useAccountingStore((s) => s.journals);
+
+  console.log('Journals:', journals);
 
   return (
     <Card className="mt-6">
@@ -29,7 +31,7 @@ export function JournalTable() {
           <TableBody>
             {journals.map((j) => (
               <TableRow key={j.id}>
-                <TableCell>{j.date}</TableCell>
+                <TableCell>{j.date.toLocaleDateString()}</TableCell>
                 <TableCell>{j.description}</TableCell>
                 <TableCell>
                   {j.lines.map((l, i) => (

@@ -1,11 +1,10 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, type PersistStorage, type StorageValue } from "zustand/middleware";
 import localforage from "localforage";
 
 import type { JournalEntry } from "@/core/models/journal";
 import type { LedgerAccount } from "@/core/models/ledger";
 import { postEntry } from "@/lib/utils/posting";
-
 
 interface AccountingState {
   journals: JournalEntry[];
@@ -14,16 +13,64 @@ interface AccountingState {
   reset: () => void;
 }
 
+// Persisted form of JournalEntry
+type PersistedJournalEntry = Omit<JournalEntry, "date"> & { date: string; };
+
+// Persisted form of AccountingState
+type PersistedAccountingState = Omit<AccountingState, "ledgers" | "journals"> & {
+  ledgers: Record<string, LedgerAccount>;
+  journals: PersistedJournalEntry[];
+};
+
 // Custom storage adapter for zustand using localforage
-const forageStorage = {
-  getItem: async (name: string) => {
+const forageStorage: PersistStorage<AccountingState> = {
+  getItem: async (name) => {
     const data = await localforage.getItem<string>(name);
-    return data ? JSON.parse(data) : null;
+    if (!data) return null;
+
+    // Parse as persisted form
+    const parsed = JSON.parse(data) as StorageValue<PersistedAccountingState>;
+
+    // Convert back to runtime form
+    const ledgersMap = new Map(Object.entries(parsed.state.ledgers));
+    const journalsWithDates: JournalEntry[] = parsed.state.journals.map((j) => ({
+      ...j,
+      date: new Date(j.date),
+    }));
+
+    const runtime: StorageValue<AccountingState> = {
+      ...parsed,
+      state: {
+        ...parsed.state,
+        ledgers: ledgersMap,
+        journals: journalsWithDates,
+      },
+    };
+
+    return runtime;
   },
-  setItem: async (name: string, value: unknown) => {
-    await localforage.setItem(name, JSON.stringify(value));
+
+  setItem: async (name, value) => {
+    // Convert runtime form to persisted form
+    const ledgersObj = Object.fromEntries(value.state.ledgers);
+    const journalsWithStrings: PersistedJournalEntry[] = value.state.journals.map((j) => ({
+      ...j,
+      date: j.date.toISOString(),
+    }));
+
+    const toSave: StorageValue<PersistedAccountingState> = {
+      ...value,
+      state: {
+        ...value.state,
+        ledgers: ledgersObj,
+        journals: journalsWithStrings,
+      },
+    };
+
+    await localforage.setItem(name, JSON.stringify(toSave));
   },
-  removeItem: async (name: string) => {
+
+  removeItem: async (name) => {
     await localforage.removeItem(name);
   },
 };
@@ -44,10 +91,11 @@ export const useAccountingStore = create<AccountingState>()(
         });
       },
 
-      reset: () => set({
-        journals: [],
-        ledgers: new Map(),
-      }),
+      reset: () =>
+        set({
+          journals: [],
+          ledgers: new Map(),
+        }),
     }),
     {
       name: "accounting-store",

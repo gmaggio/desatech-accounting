@@ -2,7 +2,7 @@ import type { JournalEntry } from "../core/models/journal";
 
 export const JOURNAL_1: JournalEntry = {
   id: "JE-001",
-  date: "2025-05-15",
+  date: new Date("2025-05-15"),
   description: "Pencairan pembiayaan tenor 5 bulan, bunga 2.5%/bulan",
   lines: [
     {
@@ -20,7 +20,7 @@ export const JOURNAL_1: JournalEntry = {
 
 export const JOURNAL_2: JournalEntry = {
   id: "JE-002",
-  date: "2025-06-14",
+  date: new Date("2025-06-14"),
   description: "Angsuran bulan pertama anggota A",
   lines: [
     {

@@ -4,7 +4,7 @@ import type { Position } from "./accounts";
 export interface JournalLine {
   accountCode: string;
   position: Position;
-  amount: number | undefined;
+  amount: number;
 }
 
 // Full journal entry (transaction)

@@ -46,7 +46,7 @@ export function JournalForm() {
   const addLine = () => {
     setLines([
       ...lines,
-      { accountCode: '', position: 'DEBIT' as Position, amount: undefined },
+      { accountCode: '', position: 'DEBIT' as Position, amount: 0 },
     ]);
   };
 
@@ -112,10 +112,11 @@ export function JournalForm() {
   const submit = () => {
     const entry: JournalEntry = {
       id: `J-${Date.now()}`,
-      date: date || new Date(),
+      date: date!,
       description,
       lines,
     };
+
     addJournal(entry);
     setDescription('');
     setDate(undefined);
@@ -222,7 +223,7 @@ export function JournalForm() {
                 type="number"
                 placeholder="Amount"
                 className="w-full text-right max-w-64"
-                value={line.amount ?? ''}
+                value={line.amount > 0 ? line.amount : ''}
                 onChange={(e) =>
                   updateLine(i, 'amount', Number(e.target.value))
                 }
