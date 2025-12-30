@@ -4,13 +4,13 @@ import type { Position } from "./accounts";
 export interface JournalLine {
   accountCode: string;
   position: Position;
-  amount: number;
+  amount: number | undefined;
 }
 
 // Full journal entry (transaction)
 export interface JournalEntry {
   id: string;
-  date: string; // ISO date string
+  date: Date;
   description: string;
   lines: JournalLine[];
 }

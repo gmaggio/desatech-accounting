@@ -3,7 +3,7 @@ import type { Account, Position } from "./accounts";
 // Ledger single post structure
 export interface LedgerPost {
   journalId: string;
-  date: string; // ISO date string
+  date: Date;
   description: string;
   position: Position;
   amount: number;

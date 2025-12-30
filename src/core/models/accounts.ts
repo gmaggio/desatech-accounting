@@ -1,5 +1,7 @@
 // Position types for accounting entries
-export type Position = 'DEBIT' | 'CREDIT';
+export const POSITIONS = ["DEBIT", "CREDIT"] as const;
+export type Position = typeof POSITIONS[number];
+
 
 // High-level classification of accounts
 export type AccountType = 'ASSET'
