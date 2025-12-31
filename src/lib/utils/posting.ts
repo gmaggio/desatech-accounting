@@ -9,7 +9,10 @@ export const accountMap = new Map<string, Account>(
   CHART_OF_ACCOUNTS.map((acc) => [acc.code, acc])
 );
 
-export function postEntry(entry: JournalEntry, ledgers: Map<string, LedgerAccount>): Map<string, LedgerAccount> {
+export function postEntry(
+  entry: JournalEntry,
+  ledgers: Map<string, LedgerAccount>
+): Map<string, LedgerAccount> {
   validateJournal(entry);
 
   for (const line of entry.lines) {

@@ -6,9 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const formatDate = (date: Date | undefined) => {
-  if (!date) {
-    return '';
-  }
+  if (!date) return '';
   return date.toLocaleDateString('id-ID', {
     day: '2-digit',
     month: 'short',

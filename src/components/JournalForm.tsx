@@ -25,6 +25,7 @@ import { cn, formatDate } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 
 export function JournalForm() {
+  const journals = useAccountingStore((s) => s.journals);
   const addJournal = useAccountingStore((s) => s.addJournal);
 
   const [description, setDescription] = useState('');
@@ -98,9 +99,23 @@ export function JournalForm() {
 
   const isValid = validateEntry(lines, date, description, difference);
 
+  function getNextJournalId(journals: JournalEntry[]) {
+    if (journals.length === 0) return '001';
+
+    // Extract numeric IDs
+    const numbers = journals
+      .map((j) => parseInt(j.id, 10))
+      .filter((n) => !isNaN(n));
+
+    const max = Math.max(...numbers);
+    const next = (max + 1).toString().padStart(3, '0');
+
+    return next;
+  }
+
   const submit = () => {
     const entry: JournalEntry = {
-      id: `J-${Date.now()}`,
+      id: getNextJournalId(journals),
       date: date!,
       description,
       lines,

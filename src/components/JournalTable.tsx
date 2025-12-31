@@ -15,8 +15,6 @@ import { formatDate } from '@/lib/utils';
 export function JournalTable() {
   const journals = useAccountingStore((s) => s.journals);
 
-  console.log('Journals:', journals);
-
   return (
     <Card className="mt-6">
       <CardHeader>
@@ -28,7 +26,7 @@ export function JournalTable() {
             <TableRow>
               <TableHead>Date</TableHead>
               <TableHead>ID</TableHead>
-              <TableHead className="max-w-xs">Description</TableHead>
+              <TableHead className="max-w-sm">Description</TableHead>
               <TableHead>Account</TableHead>
               <TableHead>Acc. ID</TableHead>
               <TableHead>Debit</TableHead>
@@ -49,7 +47,7 @@ export function JournalTable() {
                     <TableCell rowSpan={rowSpan}>{j.id}</TableCell>
                     <TableCell
                       rowSpan={rowSpan}
-                      className="max-w-xs"
+                      className="max-w-sm"
                     >
                       {j.description}
                     </TableCell>

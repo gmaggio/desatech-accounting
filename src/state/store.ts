@@ -3,7 +3,7 @@ import { persist, type PersistStorage, type StorageValue } from "zustand/middlew
 import localforage from "localforage";
 
 import type { JournalEntry } from "@/core/models/journal";
-import type { LedgerAccount } from "@/core/models/ledger";
+import type { LedgerAccount, LedgerPost } from "@/core/models/ledger";
 import { postEntry } from "@/lib/utils/posting";
 import { SAMPLE_JOURNALS } from "@/shared/examples";
 
@@ -18,9 +18,17 @@ interface AccountingState {
 // Persisted form of JournalEntry
 type PersistedJournalEntry = Omit<JournalEntry, "date"> & { date: string; };
 
+// Persisted form of LedgerPost
+type PersistedLedgerEntry = Omit<LedgerPost, "date"> & { date: string; };
+
+// Persisted form of LedgerAccount
+type PersistedLedgerAccount = Omit<LedgerAccount, "posts"> & {
+  posts: PersistedLedgerEntry[];
+};
+
 // Persisted form of AccountingState
 type PersistedAccountingState = Omit<AccountingState, "ledgers" | "journals"> & {
-  ledgers: Record<string, LedgerAccount>;
+  ledgers: Record<string, PersistedLedgerAccount>;
   journals: PersistedJournalEntry[];
 };
 
@@ -33,8 +41,19 @@ const forageStorage: PersistStorage<AccountingState> = {
     // Parse as persisted form
     const parsed = JSON.parse(raw) as StorageValue<PersistedAccountingState>;
 
-    // Convert persisted back to runtime form
-    const ledgersMap = new Map(Object.entries(parsed.state.ledgers));
+    // Convert ledgers back to runtime form
+    const ledgersMap = new Map<string, LedgerAccount>();
+    for (const [code, acc] of Object.entries(parsed.state.ledgers)) {
+      ledgersMap.set(code, {
+        ...acc,
+        posts: acc.posts.map((p) => ({
+          ...p,
+          date: new Date(p.date),
+        })),
+      });
+    }
+
+    // Convert journals back to runtime form
     const journalsWithDates: JournalEntry[] = parsed.state.journals.map((j) => ({
       ...j,
       date: new Date(j.date),
@@ -53,8 +72,19 @@ const forageStorage: PersistStorage<AccountingState> = {
   },
 
   setItem: async (name, value) => {
-    // Convert runtime form to persisted form
-    const ledgersObj = Object.fromEntries(value.state.ledgers);
+    // Convert ledger runtime form to persisted form
+    const ledgersObj: Record<string, PersistedLedgerAccount> = {};
+    for (const [code, acc] of value.state.ledgers.entries()) {
+      ledgersObj[code] = {
+        ...acc,
+        posts: acc.posts.map((p) => ({
+          ...p,
+          date: p.date.toISOString(),
+        })),
+      };
+    }
+
+    // Convert journal runtime form to persisted form
     const journalsWithStrings: PersistedJournalEntry[] = value.state.journals.map((j) => ({
       ...j,
       date: j.date.toISOString(),
@@ -84,13 +114,21 @@ export const useAccountingStore = create<AccountingState>()(
       journals: [],
       ledgers: new Map<string, LedgerAccount>(),
 
-      addJournal: (entry: JournalEntry) => {
-        const currentLedgers = new Map(get().ledgers);
-        const updatedLedgers = postEntry(entry, currentLedgers);
+      addJournal: (entry) => {
+        const updated = [...get().journals, entry];
+
+        // Sort by date ascending
+        updated.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+        // Recompute ledgers from scratch
+        let newLedgers = new Map<string, LedgerAccount>();
+        for (const j of updated) {
+          newLedgers = postEntry(j, newLedgers);
+        }
 
         set({
-          journals: [...get().journals, entry],
-          ledgers: updatedLedgers,
+          journals: updated,
+          ledgers: newLedgers,
         });
       },
 
