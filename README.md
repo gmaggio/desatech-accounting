@@ -1,73 +1,109 @@
-# React + TypeScript + Vite
+# **📘 Accounting Demo App — README**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A lightweight, educational accounting demo built with **React**, **TypeScript**, **Zustand**, and **shadcn/ui**.
+This project simulates a simple double‑entry bookkeeping workflow with journals, ledgers, and automatic posting logic.
 
-Currently, two official plugins are available:
+It is intentionally minimal, fast to run, and easy to understand — perfect for demos.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## **📦 Features**
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- ✍️ **Journal Entry Form**
+  Create debit/credit journal entries with automatic validation.
 
-## Expanding the ESLint configuration
+- 📚 **Ledger Posting Engine**
+  Every journal entry is posted into account‑specific ledgers with running balances.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- 🔄 **Automatic Recalculation**
+  Journals are sorted by date, and ledgers are rebuilt from scratch for guaranteed correctness.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- 🧪 **Temporary Demo Data**
+  The app seeds sample journals on first run to showcase functionality instantly.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- 💾 **Local Persistence**
+  All data is stored in `localforage` using a custom Zustand persistence layer that supports:
+  - `Map` serialization
+  - `Date` serialization
+  - Ledger post reconstruction
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- 🧭 **Sidebar Navigation**
+  Clean navigation with active‑route highlighting.
+
+---
+
+## **🧪 Temporary Demo Data**
+
+This project includes **sample journals** that automatically populate on first run.
+
+Why?
+
+- To demonstrate the ledger posting engine immediately
+- To show how balances evolve across multiple entries
+- To make the UI meaningful without requiring manual input
+
+The data is stored in the browser using `localforage`.
+
+---
+
+## **🚀 Getting Started**
+
+### **1. Clone the repository**
+
+```sh
+git clone https://github.com/gmaggio/desatech-accounting.git
+cd desatech-accounting
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### **2. Install dependencies**
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```sh
+npm install
 ```
+
+### **3. Run the development server**
+
+```sh
+npm run dev
+```
+
+The app will be available at:
+
+```
+http://localhost:5173
+```
+
+---
+
+## **📁 Project Structure (Simplified)**
+
+```
+src/
+  components/           # App layout, sidebar, tables, forms, and UI primitives
+    ui/                 # shadcn/ui component implementations
+  core/
+    models/             # Accounting domain models (accounts, journal, ledger)
+  lib/
+    utils/              # Posting engine + validation logic
+  pages/                # Journal and Ledger pages
+  shared/               # Constants and demo example data
+  state/                # Zustand store with persistence
+```
+
+---
+
+## **🧠 How the Posting Engine Works**
+
+1. User creates a journal entry
+2. Journals are sorted by date
+3. Ledgers are rebuilt from scratch
+4. Each line updates the account’s running balance
+5. Ledger posts are stored chronologically
+
+This ensures:
+
+- Correct balances even with backdated entries
+- No drift or cumulative errors
+- Deterministic results every time
+
+---
