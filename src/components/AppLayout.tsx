@@ -9,7 +9,9 @@ function AppLayout({ children }: { children: React.ReactNode }) {
         <AppSidebar />
 
         <main className="flex-1 p-6 overflow-y-auto">
-          <SidebarTrigger />
+          <div className="flex content-start w-full">
+            <SidebarTrigger />
+          </div>
           {children}
         </main>
       </SidebarProvider>

@@ -21,7 +21,7 @@ import {
 import { ChevronDownIcon, Trash2 } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { CHART_OF_ACCOUNTS } from '@/shared/constants';
-import { cn } from '@/lib/utils';
+import { cn, formatDate } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 
 export function JournalForm() {
@@ -31,17 +31,6 @@ export function JournalForm() {
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [lines, setLines] = useState<JournalLine[]>([]);
-
-  const formatDate = (date: Date | undefined) => {
-    if (!date) {
-      return '';
-    }
-    return date.toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    });
-  };
 
   const addLine = () => {
     setLines([
@@ -239,7 +228,7 @@ export function JournalForm() {
           ))}
         </div>
 
-        <div className="flex gap-20 pt-2">
+        <div className="flex justify-between gap-20 pt-2">
           {/* Actions */}
           <div className="flex gap-2">
             <Button
@@ -257,7 +246,7 @@ export function JournalForm() {
           </div>
 
           {/* Summary */}
-          <div className="flex flex-col w-full items-start gap-0.5 text-sm">
+          <div className="flex flex-col w-full max-w-md items-start gap-0.5 text-sm">
             <h3 className="font-bold">Summary</h3>
             <div className="flex w-full justify-between gap-2">
               <h4>Total Debit</h4>

@@ -7,6 +7,7 @@ import type { LedgerAccount } from "@/core/models/ledger";
 import { postEntry } from "@/lib/utils/posting";
 import { SAMPLE_JOURNALS } from "@/shared/examples";
 
+// Runtime (in-memory) types
 interface AccountingState {
   journals: JournalEntry[];
   ledgers: Map<string, LedgerAccount>;
@@ -26,13 +27,13 @@ type PersistedAccountingState = Omit<AccountingState, "ledgers" | "journals"> & 
 // Custom storage adapter for zustand using localforage
 const forageStorage: PersistStorage<AccountingState> = {
   getItem: async (name) => {
-    const data = await localforage.getItem<string>(name);
-    if (!data) return null;
+    const raw = await localforage.getItem<string>(name);
+    if (!raw) return null;
 
     // Parse as persisted form
-    const parsed = JSON.parse(data) as StorageValue<PersistedAccountingState>;
+    const parsed = JSON.parse(raw) as StorageValue<PersistedAccountingState>;
 
-    // Convert back to runtime form
+    // Convert persisted back to runtime form
     const ledgersMap = new Map(Object.entries(parsed.state.ledgers));
     const journalsWithDates: JournalEntry[] = parsed.state.journals.map((j) => ({
       ...j,
@@ -76,6 +77,7 @@ const forageStorage: PersistStorage<AccountingState> = {
   },
 };
 
+// Zustand Store
 export const useAccountingStore = create<AccountingState>()(
   persist(
     (set, get) => ({
@@ -100,18 +102,20 @@ export const useAccountingStore = create<AccountingState>()(
     {
       name: "accounting-store",
       storage: forageStorage,
+
       onRehydrateStorage: () => (state) => {
+        if (!state) return;
+
         // Initialize with sample data if empty for demo purposes
-        if (state && state.journals.length === 0) {
-          useAccountingStore.setState(() => {
-            let ledgers = new Map<string, LedgerAccount>();
-            for (const entry of SAMPLE_JOURNALS) {
-              ledgers = postEntry(entry, ledgers);
-            }
-            return {
-              journals: SAMPLE_JOURNALS,
-              ledgers
-            };
+        if (state.journals.length === 0) {
+          let ledgers = new Map<string, LedgerAccount>();
+          for (const entry of SAMPLE_JOURNALS) {
+            ledgers = postEntry(entry, ledgers);
+          }
+
+          useAccountingStore.setState({
+            journals: SAMPLE_JOURNALS,
+            ledgers
           });
         }
       },

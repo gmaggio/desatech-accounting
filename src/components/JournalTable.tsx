@@ -8,6 +8,9 @@ import {
   TableCell,
   Table,
 } from '@/components/ui/table';
+import { Fragment } from 'react/jsx-runtime';
+import { accountMap } from '@/lib/utils/posting';
+import { formatDate } from '@/lib/utils';
 
 export function JournalTable() {
   const journals = useAccountingStore((s) => s.journals);
@@ -24,24 +27,72 @@ export function JournalTable() {
           <TableHeader>
             <TableRow>
               <TableHead>Date</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Lines</TableHead>
+              <TableHead>ID</TableHead>
+              <TableHead className="max-w-xs">Description</TableHead>
+              <TableHead>Account</TableHead>
+              <TableHead>Acc. ID</TableHead>
+              <TableHead>Debit</TableHead>
+              <TableHead>Credit</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {journals.map((j) => (
-              <TableRow key={j.id}>
-                <TableCell>{j.date.toLocaleDateString()}</TableCell>
-                <TableCell>{j.description}</TableCell>
-                <TableCell>
-                  {j.lines.map((l, i) => (
-                    <div key={i}>
-                      {l.accountCode} {l.position} {l.amount.toLocaleString()}
-                    </div>
+
+          <TableBody className="text-left [&>tr>td]:align-top [&>tr>td]:text-wrap">
+            {journals.map((j) => {
+              const rowSpan = j.lines.length;
+
+              return (
+                <Fragment key={j.id}>
+                  <TableRow>
+                    <TableCell rowSpan={rowSpan}>
+                      {formatDate(j.date)}
+                    </TableCell>
+                    <TableCell rowSpan={rowSpan}>{j.id}</TableCell>
+                    <TableCell
+                      rowSpan={rowSpan}
+                      className="max-w-xs"
+                    >
+                      {j.description}
+                    </TableCell>
+
+                    {/* Journal lines - first line */}
+                    <TableCell>
+                      {accountMap.get(j.lines[0].accountCode)?.name}
+                    </TableCell>
+                    <TableCell>{j.lines[0].accountCode}</TableCell>
+                    <TableCell className="text-right">
+                      {j.lines[0].position === 'DEBIT'
+                        ? j.lines[0].amount.toLocaleString()
+                        : ''}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {j.lines[0].position === 'CREDIT'
+                        ? j.lines[0].amount.toLocaleString()
+                        : ''}
+                    </TableCell>
+                  </TableRow>
+
+                  {/* Journal line - remaining lines */}
+                  {j.lines.slice(1).map((l, idx) => (
+                    <TableRow key={idx}>
+                      <TableCell>
+                        {accountMap.get(l.accountCode)?.name}
+                      </TableCell>
+                      <TableCell>{l.accountCode}</TableCell>
+                      <TableCell className="text-right">
+                        {l.position === 'DEBIT'
+                          ? l.amount.toLocaleString()
+                          : ''}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {l.position === 'CREDIT'
+                          ? l.amount.toLocaleString()
+                          : ''}
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </TableCell>
-              </TableRow>
-            ))}
+                </Fragment>
+              );
+            })}
           </TableBody>
         </Table>
       </CardContent>

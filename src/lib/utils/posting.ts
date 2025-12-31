@@ -5,7 +5,7 @@ import { validateJournal } from "@/lib/utils/validation";
 import { CHART_OF_ACCOUNTS } from "@/shared/constants";
 
 // Create a map for quick account lookup by code
-const accountMap = new Map<string, Account>(
+export const accountMap = new Map<string, Account>(
   CHART_OF_ACCOUNTS.map((acc) => [acc.code, acc])
 );
 
