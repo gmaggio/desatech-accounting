@@ -22,12 +22,26 @@ export function LedgerTable() {
         {[...ledgers.values()].map((ledger) => (
           <div
             key={ledger.account.code}
-            className="mb-6"
+            className="mb-10"
           >
-            <h3 className="font-semibold mb-2">
-              {ledger.account.code} - {ledger.account.name} (
-              {ledger.account.type})
-            </h3>
+            <div className="flex items-center justify-between w-full pb-2">
+              <h3 className="font-bold mb-2">
+                <span className="text-xs text-primary/75">
+                  {ledger.account.code} -{' '}
+                </span>
+                {ledger.account.name}
+                {'  '}
+                <span className="text-xs text-primary/50">
+                  ({ledger.account.type})
+                </span>
+              </h3>
+              <div className="flex flex-col text-right">
+                <p className="text-xs text-primary/75">Current Balance</p>
+                <p className="text-lg font-bold">
+                  {ledger.endingBalance.toLocaleString()}
+                </p>
+              </div>
+            </div>
             <Card className="p-0">
               <Table>
                 <TableHeader>
@@ -48,25 +62,24 @@ export function LedgerTable() {
                         {p.description}
                       </TableCell>
                       <TableCell>{p.journalId}</TableCell>
-                      <TableCell className="text-green-600">
+                      <TableCell className="text-right text-green-600">
                         {p.position === 'DEBIT'
                           ? p.amount.toLocaleString()
                           : ''}
                       </TableCell>
-                      <TableCell className="text-red-600">
+                      <TableCell className="text-right text-red-600">
                         {p.position === 'CREDIT'
                           ? p.amount.toLocaleString()
                           : ''}
                       </TableCell>
-                      <TableCell>{p.balanceAfter.toLocaleString()}</TableCell>
+                      <TableCell className="text-right">
+                        {p.balanceAfter.toLocaleString()}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             </Card>
-            <div className="mt-2 font-bold">
-              Ending Balance: {ledger.endingBalance.toLocaleString()}
-            </div>
           </div>
         ))}
       </CardContent>
