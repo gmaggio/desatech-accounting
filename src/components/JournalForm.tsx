@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { useAccountingStore } from '@/state/store';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -179,17 +179,19 @@ export function JournalForm() {
         </div>
 
         {/* Line Entries */}
-        <div className={cn('space-y-4', lines.length > 0 && 'pt-2')}>
+        <div
+          className={cn(
+            lines.length === 0 && 'm-0',
+            'grid grid-cols-[2fr_auto_1fr_auto] gap-2'
+          )}
+        >
           {lines.map((line, i) => (
-            <div
-              key={i}
-              className="flex gap-2"
-            >
+            <Fragment key={i}>
               <Select
                 value={line.accountCode}
                 onValueChange={(val) => updateLine(i, 'accountCode', val)}
               >
-                <SelectTrigger className="w-full max-w-1/2">
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Account Code" />
                 </SelectTrigger>
                 <SelectContent>
@@ -209,7 +211,7 @@ export function JournalForm() {
                   updateLine(i, 'position', val as Position)
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-full max-w-24">
                   <SelectValue placeholder="Position" />
                 </SelectTrigger>
                 <SelectContent>
@@ -226,7 +228,7 @@ export function JournalForm() {
               <Input
                 type="number"
                 placeholder="Amount"
-                className="w-full text-right max-w-64"
+                className="w-full text-right"
                 value={line.amount > 0 ? line.amount : ''}
                 onChange={(e) =>
                   updateLine(i, 'amount', Number(e.target.value))
@@ -239,11 +241,11 @@ export function JournalForm() {
               >
                 <Trash2 />
               </Button>
-            </div>
+            </Fragment>
           ))}
         </div>
 
-        <div className="flex justify-between gap-20 pt-2">
+        <div className="flex justify-between gap-20">
           {/* Actions */}
           <div className="flex gap-2">
             <Button
