@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/table';
 import { Fragment } from 'react/jsx-runtime';
 import { accountMap } from '@/lib/utils/posting';
-import { formatDate } from '@/lib/utils';
+import { cn, formatDate } from '@/lib/utils';
 
 export function JournalTable() {
   const journals = useAccountingStore((s) => s.journals);
@@ -37,6 +37,7 @@ export function JournalTable() {
           <TableBody className="text-left [&>tr>td]:align-top [&>tr>td]:text-wrap">
             {journals.map((j) => {
               const rowSpan = j.lines.length;
+              const isFirstLineDebit = j.lines[0].position === 'DEBIT';
 
               return (
                 <Fragment key={j.id}>
@@ -53,41 +54,41 @@ export function JournalTable() {
                     </TableCell>
 
                     {/* Journal lines - first line */}
-                    <TableCell>
+                    <TableCell className={cn(!isFirstLineDebit && 'pl-4')}>
                       {accountMap.get(j.lines[0].accountCode)?.name}
                     </TableCell>
                     <TableCell>{j.lines[0].accountCode}</TableCell>
                     <TableCell className="text-right">
-                      {j.lines[0].position === 'DEBIT'
+                      {isFirstLineDebit
                         ? j.lines[0].amount.toLocaleString()
                         : ''}
                     </TableCell>
                     <TableCell className="text-right">
-                      {j.lines[0].position === 'CREDIT'
+                      {!isFirstLineDebit
                         ? j.lines[0].amount.toLocaleString()
                         : ''}
                     </TableCell>
                   </TableRow>
 
                   {/* Journal line - remaining lines */}
-                  {j.lines.slice(1).map((l, idx) => (
-                    <TableRow key={idx}>
-                      <TableCell>
-                        {accountMap.get(l.accountCode)?.name}
-                      </TableCell>
-                      <TableCell>{l.accountCode}</TableCell>
-                      <TableCell className="text-right">
-                        {l.position === 'DEBIT'
-                          ? l.amount.toLocaleString()
-                          : ''}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {l.position === 'CREDIT'
-                          ? l.amount.toLocaleString()
-                          : ''}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {j.lines.slice(1).map((l, idx) => {
+                    const isDebit = l.position === 'DEBIT';
+
+                    return (
+                      <TableRow key={idx}>
+                        <TableCell className={cn(!isDebit && 'pl-4')}>
+                          {accountMap.get(l.accountCode)?.name}
+                        </TableCell>
+                        <TableCell>{l.accountCode}</TableCell>
+                        <TableCell className="text-right">
+                          {isDebit ? l.amount.toLocaleString() : ''}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {!isDebit ? l.amount.toLocaleString() : ''}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </Fragment>
               );
             })}

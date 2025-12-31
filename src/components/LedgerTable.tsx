@@ -1,5 +1,5 @@
 import { useAccountingStore } from '@/state/store';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Table,
   TableHeader,
@@ -15,17 +15,14 @@ export function LedgerTable() {
 
   return (
     <Card className="mt-6">
-      <CardHeader>
-        <CardTitle>Ledger Accounts</CardTitle>
-      </CardHeader>
       <CardContent>
         {[...ledgers.values()].map((ledger) => (
           <div
             key={ledger.account.code}
-            className="mb-10"
+            className="mb-12"
           >
-            <div className="flex items-center justify-between w-full pb-2">
-              <h3 className="font-bold mb-2">
+            <div className="flex items-end justify-between w-full pb-2">
+              <h3 className="font-bold">
                 <span className="text-xs text-primary/75">
                   {ledger.account.code} -{' '}
                 </span>
@@ -54,7 +51,7 @@ export function LedgerTable() {
                     <TableHead>Balance</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody className="text-left [&>tr>td]:align-top [&>tr>td]:text-wrap">
+                <TableBody className="text-left [&>tr>td]:text-wrap">
                   {ledger.posts.map((p, i) => (
                     <TableRow key={i}>
                       <TableCell>{formatDate(p.date)}</TableCell>
