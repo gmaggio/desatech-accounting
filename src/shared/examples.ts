@@ -40,3 +40,5 @@ export const JOURNAL_2: JournalEntry = {
     },
   ],
 };
+
+export const SAMPLE_JOURNALS: JournalEntry[] = [JOURNAL_1, JOURNAL_2];

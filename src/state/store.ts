@@ -5,6 +5,7 @@ import localforage from "localforage";
 import type { JournalEntry } from "@/core/models/journal";
 import type { LedgerAccount } from "@/core/models/ledger";
 import { postEntry } from "@/lib/utils/posting";
+import { SAMPLE_JOURNALS } from "@/shared/examples";
 
 interface AccountingState {
   journals: JournalEntry[];
@@ -91,15 +92,29 @@ export const useAccountingStore = create<AccountingState>()(
         });
       },
 
-      reset: () =>
-        set({
-          journals: [],
-          ledgers: new Map(),
-        }),
+      reset: () => set({
+        journals: [],
+        ledgers: new Map(),
+      }),
     }),
     {
       name: "accounting-store",
       storage: forageStorage,
+      onRehydrateStorage: () => (state) => {
+        // Initialize with sample data if empty for demo purposes
+        if (state && state.journals.length === 0) {
+          useAccountingStore.setState(() => {
+            let ledgers = new Map<string, LedgerAccount>();
+            for (const entry of SAMPLE_JOURNALS) {
+              ledgers = postEntry(entry, ledgers);
+            }
+            return {
+              journals: SAMPLE_JOURNALS,
+              ledgers
+            };
+          });
+        }
+      },
     }
   )
 );
